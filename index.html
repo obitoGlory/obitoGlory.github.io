@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BotFather 3D Dashboard Clone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body { overflow-x: hidden; background: #000; color: white; font-family: system-ui, sans-serif; }
+    .glass-card {
+      background: rgba(30, 30, 40, 0.4);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .glass-card:hover {
+      transform: translateY(-12px) rotateX(8deg) rotateY(8deg) scale(1.04);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+    }
+    #three-bg { position: fixed; inset: 0; z-index: -1; }
+  </style>
+</head>
+<body class="min-h-screen relative">
+
+  <!-- Background 3D sederhana (partikel / grid) -->
+  <div id="three-bg"></div>
+
+  <div class="relative z-10 container mx-auto px-4 py-10 max-w-5xl">
+
+    <!-- Header mirip BotFather -->
+    <div class="text-center mb-12">
+      <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-2xl">
+        <img src="https://via.placeholder.com/96?text=BF" alt="BotFather" class="w-full h-full object-cover"/>
+      </div>
+      <h1 class="text-5xl font-bold mb-2">BotFather</h1>
+      <p class="text-xl text-gray-400">The one bot to rule them all</p>
+      <a href="#" class="text-blue-400 hover:text-blue-300 mt-2 inline-block">Learn more →</a>
+    </div>
+
+    <!-- Search -->
+    <div class="max-w-xl mx-auto mb-10">
+      <input 
+        type="text" 
+        placeholder="Search bots..." 
+        class="w-full py-4 px-6 bg-gray-900/60 border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+      />
+    </div>
+
+    <!-- My Bots -->
+    <h2 class="text-3xl font-semibold mb-6">My bots</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Card Create New -->
+      <div class="glass-card rounded-2xl p-8 text-center cursor-pointer hover:bg-blue-900/20">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-600/30 flex items-center justify-center text-4xl font-bold">+</div>
+        <h3 class="text-2xl font-bold mb-2">Create a New Bot</h3>
+        <p class="text-gray-400">Add your next awesome bot</p>
+      </div>
+
+      <!-- Contoh bot card -->
+      <div class="glass-card rounded-2xl p-6 cursor-pointer">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-3xl">D</div>
+          <div>
+            <h3 class="text-xl font-bold">DikaxMods✨</h3>
+            <p class="text-sm text-gray-400">@dikaxmodsbot</p>
+          </div>
+        </div>
+        <p class="text-gray-300">Modifikasi & custom bot terbaik</p>
+      </div>
+
+      <!-- Tambah card lain sesuai kebutuhan -->
+      <div class="glass-card rounded-2xl p-6 cursor-pointer">...</div>
+      <div class="glass-card rounded-2xl p-6 cursor-pointer">...</div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Three.js background sederhana (bintang/partikel)
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000011);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('three-bg').appendChild(renderer.domElement);
+
+    // Partikel bintang
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCnt = 5000;
+    const posArray = new Float32Array(particlesCnt * 3);
+    for(let i = 0; i < particlesCnt * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 2000;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 2,
+      color: 0x8888ff,
+      transparent: true,
+      opacity: 0.6
+    });
+
+    const particlesMesh = new THREE.Points(particlesGeometry, material);
+    scene.add(particlesMesh);
+
+    camera.position.z = 500;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      particlesMesh.rotation.y += 0.0002;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
