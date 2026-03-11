@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dika • Links</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+        
+        html, body {
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body {
+            background-color: #0f0f0f;
+            background-image: url('https://files.catbox.moe/9h7wpt.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        .glass {
+            background: rgba(15, 15, 30, 0.45);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neon-glow {
+            text-shadow: 0 0 15px #c026d3, 0 0 30px #a855f7;
+        }
+
+        .profile-container {
+            width: 7rem;
+            height: 7rem;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .profile-container:hover {
+            transform: scale(1.08) rotate(3deg);
+        }
+
+        /* iOS Alert Animation */
+        .animate-ios-in {
+            animation: iosSpring 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes iosSpring {
+            0% { transform: translate(-50%, -100px) scale(0.8); opacity: 0; filter: blur(10px); }
+            100% { transform: translate(-50%, 0) scale(1); opacity: 1; filter: blur(0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6 relative">
+
+    <div id="saweria-alert" class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-sm hidden">
+        <div class="glass rounded-[35px] p-6 shadow-2xl border border-white/20 flex flex-col items-center text-center animate-ios-in">
+            <div id="sw-media-box" class="mb-4 hidden">
+                <img id="sw-media" src="" class="w-20 h-20 rounded-2xl object-cover border-2 border-purple-500 shadow-lg">
+            </div>
+            <h3 class="text-purple-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">New Support</h3>
+            <p id="sw-donator" class="text-white font-bold text-xl leading-tight"></p>
+            <p id="sw-amount" class="text-green-400 font-bold text-2xl mt-1"></p>
+            <div class="w-12 h-[2px] bg-white/20 my-4 rounded-full"></div>
+            <p id="sw-message" class="text-zinc-300 text-sm italic leading-relaxed"></p>
+        </div>
+    </div>
+
+    <div class="max-w-md w-full mx-auto py-10">
+        <div class="text-center mb-12">
+            <div class="mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/50 profile-container">
+                <img src="https://raw.githubusercontent.com/IkyyExecutive-v2/IkyySukaNgewe/main/uploads/1772997219908_82959_1772997218523_file_2209.jpg" alt="Profile Dika" class="w-full h-full object-cover">
+            </div>
+            <h1 class="text-5xl font-bold mt-6 tracking-tighter neon-glow" style="font-family: 'Space Grotesk', sans-serif;">DIKA</h1>
+            <p class="text-purple-300 mt-1 text-lg">execuidor • team</p>
+        </div>
+
+        <div class="space-y-5">
+            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group" data-tilt>
+                <div class="w-12 h-12 bg-gradient-to-tr from-[#f56040] via-[#c13584] to-[#833ab4] rounded-2xl flex items-center justify-center text-3xl">
+                    <i class="fa-brands fa-instagram"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-xl group-hover:text-pink-400 transition-colors">Instagram</div>
+                    <div class="text-zinc-400 text-sm">@obitoesquado</div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-purple-400 group-hover:translate-x-2 transition-transform"></i>
+            </a>
+
+            <a href="https://t.me/porqueen" target="_blank" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group" data-tilt>
+                <div class="w-12 h-12 bg-[#229ED9] rounded-2xl flex items-center justify-center text-3xl">
+                    <i class="fa-brands fa-telegram"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-xl">Telegram</div>
+                    <div class="text-zinc-400 text-sm">@porqueen</div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-purple-400 group-hover:translate-x-2 transition-transform"></i>
+            </a>
+
+            <div onclick="copyDiscord()" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group cursor-pointer" data-tilt>
+                <div class="w-12 h-12 bg-[#5865F2] rounded-2xl flex items-center justify-center text-3xl">
+                    <i class="fa-brands fa-discord"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-xl">Discord</div>
+                    <div class="text-zinc-400 text-sm" id="discord-text">@dikaalonely</div>
+                </div>
+                <i class="fa-solid fa-copy text-purple-400 group-hover:scale-110 transition-transform"></i>
+            </div>
+        </div>
+
+        <p class="text-center text-zinc-500 text-xs mt-12">made by dikatech</p>
+    </div>
+
+    <script>
+        // --- VANILLA TILT ---
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 10,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.3,
+            perspective: 1000,
+        });
+
+        // --- DISCORD COPY ---
+        function copyDiscord() {
+            navigator.clipboard.writeText("dikaalonely").then(() => {
+                const el = document.getElementById('discord-text');
+                el.textContent = "copied!";
+                el.classList.add('text-green-400');
+                setTimeout(() => {
+                    el.textContent = "@dikaalonely";
+                    el.classList.remove('text-green-400');
+                }, 2000);
+            });
+        }
+
+        // --- SAWERIA ENGINE (PUSHER) ---
+        const streamKey = 'b86b00346473366df7a8c3717fe545f4';
+        const pusher = new Pusher('70a440f63da086f026a7', { cluster: 'ap1' });
+        const channel = pusher.subscribe(`private-${streamKey}`);
+
+        function triggerAlert(data) {
+            const alertBox = document.getElementById('saweria-alert');
+            const mediaBox = document.getElementById('sw-media-box');
+            
+            document.getElementById('sw-donator').innerText = data.donator_name || 'Anonymous';
+            document.getElementById('sw-amount').innerText = 'Rp ' + parseInt(data.amount).toLocaleString('id-ID');
+            document.getElementById('sw-message').innerText = data.message || 'Semangat terus bang!';
+
+            if (data.media) {
+                document.getElementById('sw-media').src = data.media;
+                mediaBox.classList.remove('hidden');
+            } else {
+                mediaBox.classList.add('hidden');
+            }
+
+            alertBox.classList.remove('hidden');
+            
+            setTimeout(() => {
+                alertBox.classList.add('hidden');
+            }, 8000);
+        }
+
+        channel.bind('donation', (data) => triggerAlert(data));
+        channel.bind('test-alert', (data) => triggerAlert({
+            donator_name: data.donator_name || "Mumu (Test)",
+            amount: data.amount || 10000,
+            message: data.message || "Semangat ya kamu 😘"
+        }));
+    </script>
+</body>
+</html>
