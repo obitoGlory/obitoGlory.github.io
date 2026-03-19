@@ -1,7 +1,7 @@
 <div align="center">
 
-# 👋 Hi, I'm Dika (obitoGlory)
-### 🎨 DKV Student | 💻 Web & App Developer | 🛠️ System Architect
+# 👋 Hi, I'm Dika
+### 🎨 DKV Student | 💻 Web & Bot Developer | 🛠️ ScriptKiddie
 
 <p align="center">
   <img src="https://komarev.com/ghpvc/?username=obitoGlory&label=Profile%20Views&color=7d2ae8&style=flat-square" alt="Views" />
@@ -15,7 +15,7 @@
   Fokus pada pengembangan sistem bot, otomatisasi, dan desain antarmuka yang clean & modern.
 </p>
 
-[ 📂 [Portfolio](https://obitoGlory.github.io) ] • [ 📱 [TikTok](https://www.tiktok.com/@dikasecx) ] • [ ✈️ [Telegram](https://t.me/onedikaa) ]
+[ 📂 [SocialLink](https://obitoGlory.github.io) ] • [ 📱 [TikTok](https://www.tiktok.com/@dikasecx) ] • [ ✈️ [Telegram](https://t.me/onedikaa) ]
 
 </div>
 
@@ -24,9 +24,6 @@
 ### 🛠️ Tech Stack & Skills
 
 - **Design:** Adobe Creative Suite, Figma, UI/UX Principles.
-- **Frontend:** HTML5, CSS3, JavaScript (React/Next.js soon).
-- **Backend:** Node.js, Python (Automation scripts & Bots).
-- **Others:** Linux (WSL Ubuntu), Cybersecurity, PC Hardware Optimization.
 
 ### 📊 GitHub Stats
 
