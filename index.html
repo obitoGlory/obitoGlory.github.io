@@ -3,180 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dika • Links</title>
+    <title>Dika • Digital Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
-    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@700&display=swap');
         
-        html, body {
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
         body {
-            background-color: #0f0f0f;
-            background-image: url('https://files.catbox.moe/9h7wpt.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: #050505;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
             font-family: 'Inter', sans-serif;
             color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
         }
 
         .glass {
-            background: rgba(15, 15, 30, 0.45);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .neon-glow {
-            text-shadow: 0 0 15px #c026d3, 0 0 30px #a855f7;
+        .glass:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .profile-container {
-            width: 7rem;
-            height: 7rem;
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .neon-text {
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
         }
 
-        .profile-container:hover {
-            transform: scale(1.08) rotate(3deg);
+        .profile-img {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* iOS Alert Animation */
-        .animate-ios-in {
-            animation: iosSpring 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        .profile-img:hover {
+            transform: scale(1.15) rotate(5deg);
         }
 
-        @keyframes iosSpring {
-            0% { transform: translate(-50%, -100px) scale(0.8); opacity: 0; filter: blur(10px); }
-            100% { transform: translate(-50%, 0) scale(1); opacity: 1; filter: blur(0); }
-        }
+        /* Optimization for fast rendering */
+        * { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="flex items-center justify-center p-6 relative">
+<body class="p-6">
 
-    <div id="saweria-alert" class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-sm hidden">
-        <div class="glass rounded-[35px] p-6 shadow-2xl border border-white/20 flex flex-col items-center text-center animate-ios-in">
-            <div id="sw-media-box" class="mb-4 hidden">
-                <img id="sw-media" src="" class="w-20 h-20 rounded-2xl object-cover border-2 border-purple-500 shadow-lg">
+    <div class="max-w-md w-full mx-auto">
+        <div class="text-center mb-10">
+            <div class="relative inline-block">
+                <div class="w-28 h-28 mx-auto rounded-3xl overflow-hidden border-2 border-purple-500/50 p-1 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                    <img src="https://raw.githubusercontent.com/IkyyExecutive-v2/IkyySukaNgewe/main/uploads/1772997219908_82959_1772997218523_file_2209.jpg" 
+                         alt="Dika" class="w-full h-full object-cover rounded-[1.2rem] profile-img">
+                </div>
             </div>
-            <h3 class="text-purple-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">New Support</h3>
-            <p id="sw-donator" class="text-white font-bold text-xl leading-tight"></p>
-            <p id="sw-amount" class="text-green-400 font-bold text-2xl mt-1"></p>
-            <div class="w-12 h-[2px] bg-white/20 my-4 rounded-full"></div>
-            <p id="sw-message" class="text-zinc-300 text-sm italic leading-relaxed"></p>
-        </div>
-    </div>
-
-    <div class="max-w-md w-full mx-auto py-10">
-        <div class="text-center mb-12">
-            <div class="mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/50 profile-container">
-                <img src="https://raw.githubusercontent.com/IkyyExecutive-v2/IkyySukaNgewe/main/uploads/1772997219908_82959_1772997218523_file_2209.jpg" alt="Profile Dika" class="w-full h-full object-cover">
-            </div>
-            <h1 class="text-5xl font-bold mt-6 tracking-tighter neon-glow" style="font-family: 'Space Grotesk', sans-serif;">DIKA</h1>
-            <p class="text-purple-300 mt-1 text-lg">execuidor • team</p>
+            <h1 class="text-4xl font-bold mt-5 tracking-tight neon-text" style="font-family: 'Space Grotesk', sans-serif;">DIKA TECH</h1>
+            <p class="text-zinc-400 text-sm mt-1 uppercase tracking-widest">Digital Architect • DKV Student</p>
         </div>
 
-        <div class="space-y-5">
-            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group" data-tilt>
-                <div class="w-12 h-12 bg-gradient-to-tr from-[#f56040] via-[#c13584] to-[#833ab4] rounded-2xl flex items-center justify-center text-3xl">
-                    <i class="fa-brands fa-instagram"></i>
+        <div class="space-y-4">
+            
+            <a href="https://obitoGlory.github.io" target="_blank" class="glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt>
+                <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-2xl text-white">
+                    <i class="fa-solid fa-globe"></i>
                 </div>
                 <div class="flex-1">
-                    <div class="font-semibold text-xl group-hover:text-pink-400 transition-colors">Instagram</div>
-                    <div class="text-zinc-400 text-sm">@obitoesquado</div>
+                    <div class="font-semibold">Portfolio</div>
+                    <div class="text-zinc-500 text-xs">obitoGlory.github.io</div>
                 </div>
-                <i class="fa-solid fa-arrow-right text-purple-400 group-hover:translate-x-2 transition-transform"></i>
+                <i class="fa-solid fa-arrow-up-right-from-square text-zinc-600 group-hover:text-purple-400 transition-colors"></i>
             </a>
 
-            <a href="https://t.me/porqueen" target="_blank" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group" data-tilt>
-                <div class="w-12 h-12 bg-[#229ED9] rounded-2xl flex items-center justify-center text-3xl">
+            <a href="https://github.com/obitoGlory" target="_blank" class="glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt>
+                <div class="w-12 h-12 bg-[#24292e] rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold">GitHub</div>
+                    <div class="text-zinc-500 text-xs">@obitoGlory</div>
+                </div>
+                <i class="fa-solid fa-code text-zinc-600 group-hover:text-purple-400"></i>
+            </a>
+
+            <a href="https://t.me/onedikaa" target="_blank" class="glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt>
+                <div class="w-12 h-12 bg-[#0088cc] rounded-xl flex items-center justify-center text-2xl">
                     <i class="fa-brands fa-telegram"></i>
                 </div>
                 <div class="flex-1">
-                    <div class="font-semibold text-xl">Telegram</div>
-                    <div class="text-zinc-400 text-sm">@porqueen</div>
+                    <div class="font-semibold">Telegram</div>
+                    <div class="text-zinc-500 text-xs">@onedikaa</div>
                 </div>
-                <i class="fa-solid fa-arrow-right text-purple-400 group-hover:translate-x-2 transition-transform"></i>
+                <i class="fa-solid fa-paper-plane text-zinc-600 group-hover:text-purple-400"></i>
             </a>
 
-            <div onclick="copyDiscord()" class="social-card glass rounded-3xl p-5 flex items-center gap-5 group cursor-pointer" data-tilt>
-                <div class="w-12 h-12 bg-[#5865F2] rounded-2xl flex items-center justify-center text-3xl">
+            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt>
+                <div class="w-12 h-12 bg-gradient-to-tr from-[#f56040] to-[#833ab4] rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-brands fa-instagram"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold">Instagram</div>
+                    <div class="text-zinc-500 text-xs">@obitoesquado</div>
+                </div>
+                <i class="fa-solid fa-camera text-zinc-600 group-hover:text-purple-400"></i>
+            </a>
+
+            <a href="https://www.tiktok.com/@dikasecx" target="_blank" class="glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt>
+                <div class="w-12 h-12 bg-black border border-white/20 rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-brands fa-tiktok"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold">TikTok</div>
+                    <div class="text-zinc-500 text-xs">@dikasecx</div>
+                </div>
+                <i class="fa-solid fa-play text-zinc-600 group-hover:text-purple-400"></i>
+            </a>
+
+            <div onclick="copyDiscord()" class="glass rounded-2xl p-4 flex items-center gap-4 group cursor-pointer" data-tilt>
+                <div class="w-12 h-12 bg-[#5865F2] rounded-xl flex items-center justify-center text-2xl">
                     <i class="fa-brands fa-discord"></i>
                 </div>
                 <div class="flex-1">
-                    <div class="font-semibold text-xl">Discord</div>
-                    <div class="text-zinc-400 text-sm" id="discord-text">@dikaalonely</div>
+                    <div class="font-semibold">Discord</div>
+                    <div id="discord-text" class="text-zinc-500 text-xs">@dikaalonely</div>
                 </div>
-                <i class="fa-solid fa-copy text-purple-400 group-hover:scale-110 transition-transform"></i>
+                <i class="fa-solid fa-copy text-zinc-600 group-hover:text-purple-400"></i>
             </div>
+
         </div>
 
-        <p class="text-center text-zinc-500 text-xs mt-12">made by dikatech</p>
+        <footer class="mt-12 text-center">
+            <p class="text-[10px] text-zinc-600 uppercase tracking-[0.3em]">System Optimized by ObitoGlory</p>
+        </footer>
     </div>
 
     <script>
-        // --- VANILLA TILT ---
         VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-            max: 10,
-            speed: 400,
+            max: 8,
+            speed: 1000,
             glare: true,
-            "max-glare": 0.3,
-            perspective: 1000,
+            "max-glare": 0.2,
+            scale: 1.02
         });
 
-        // --- DISCORD COPY ---
         function copyDiscord() {
-            navigator.clipboard.writeText("dikaalonely").then(() => {
-                const el = document.getElementById('discord-text');
-                el.textContent = "copied!";
-                el.classList.add('text-green-400');
-                setTimeout(() => {
-                    el.textContent = "@dikaalonely";
-                    el.classList.remove('text-green-400');
-                }, 2000);
-            });
-        }
-
-        // --- SAWERIA ENGINE (PUSHER) ---
-        const streamKey = 'b86b00346473366df7a8c3717fe545f4';
-        const pusher = new Pusher('70a440f63da086f026a7', { cluster: 'ap1' });
-        const channel = pusher.subscribe(`private-${streamKey}`);
-
-        function triggerAlert(data) {
-            const alertBox = document.getElementById('saweria-alert');
-            const mediaBox = document.getElementById('sw-media-box');
-            
-            document.getElementById('sw-donator').innerText = data.donator_name || 'Anonymous';
-            document.getElementById('sw-amount').innerText = 'Rp ' + parseInt(data.amount).toLocaleString('id-ID');
-            document.getElementById('sw-message').innerText = data.message || 'Semangat terus bang!';
-
-            if (data.media) {
-                document.getElementById('sw-media').src = data.media;
-                mediaBox.classList.remove('hidden');
-            } else {
-                mediaBox.classList.add('hidden');
-            }
-
-            alertBox.classList.remove('hidden');
-            
+            navigator.clipboard.writeText("dikaalonely");
+            const el = document.getElementById('discord-text');
+            const original = el.innerText;
+            el.innerText = "Copied to clipboard!";
+            el.style.color = "#a855f7";
             setTimeout(() => {
-                alertBox.classList.add('hidden');
-            }, 8000);
+                el.innerText = original;
+                el.style.color = "";
+            }, 1500);
         }
-
-        channel.bind('donation', (data) => triggerAlert(data));
-        channel.bind('test-alert', (data) => triggerAlert({
-            donator_name: data.donator_name || "Mumu (Test)",
-            amount: data.amount || 10000,
-            message: data.message || "Semangat ya kamu 😘"
-        }));
     </script>
 </body>
 </html>
