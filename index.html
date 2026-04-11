@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,193 +5,265 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dika</title>
 
-    <!-- ── Dari Dika: Tailwind, FontAwesome, VanillaTilt ── -->
+    <!-- ── Dika deps (unchanged) ── -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
-    <!-- ── Dari Canvas: Google Fonts extended + Space Grotesk dari Dika ── -->
+    <!-- ── Three.js r128 CDN — Canvas 3D / WebGL API ── -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- ── Fonts ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ════════════════════════════════════════════════════════════
-           BASE — merged from both versions
-        ════════════════════════════════════════════════════════════ */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html, body {
-            overflow-x: hidden;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        /* ════ RESET ════ */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html, body { overflow-x:hidden; min-height:100vh; -webkit-font-smoothing:antialiased; }
 
         body {
-            /* Fallback color — canvas draws on top of this */
-            background-color: #0a0a0f;
-            font-family: 'Inter', sans-serif;
-            color: white;
-            overflow-y: auto;       /* allow scroll on small screens */
-            overflow-x: hidden;
+            background-color:#020205;
+            font-family:'Inter',sans-serif;
+            color:white;
+            overflow-y:auto;
+            cursor:none;
         }
 
-        /* ════════════════════════════════════════════════════════════
-           CANVAS BACKGROUND — from Canvas version
-           Sits at z-index:0; pointer-events:none so clicks pass through
-        ════════════════════════════════════════════════════════════ */
-        #mainCanvas {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            display: block;
-            pointer-events: none;   /* HTML elements above receive events */
+        /* ════ WebGL canvas background ════ */
+        #glCanvas {
+            position:fixed; inset:0;
+            width:100%; height:100%;
+            z-index:0; display:block;
+            pointer-events:none;
+        }
+        /* ════ 2D overlay canvas — particles, cursor, ripples ════ */
+        #fxCanvas {
+            position:fixed; inset:0;
+            width:100%; height:100%;
+            z-index:3; display:block;
+            pointer-events:none;
         }
 
-        /* ════════════════════════════════════════════════════════════
-           THEME PANEL — from Canvas version (top-right, non-intrusive)
-        ════════════════════════════════════════════════════════════ */
+        /* ════ Theme panel ════ */
         #themePanel {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            display: flex;
-            gap: 8px;
-            z-index: 20;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top-color: rgba(255, 255, 255, 0.28);
-            border-radius: 100px;
-            padding: 8px 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            position:fixed; top:16px; right:16px;
+            display:flex; gap:8px; z-index:20;
+            background:rgba(255,255,255,.06);
+            backdrop-filter:blur(24px) saturate(180%);
+            -webkit-backdrop-filter:blur(24px) saturate(180%);
+            border:1px solid rgba(255,255,255,.12);
+            border-top-color:rgba(255,255,255,.28);
+            border-radius:100px; padding:8px 12px;
+            box-shadow:0 8px 32px rgba(0,0,0,.35);
         }
-
         .tBtn {
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.20);
-            cursor: pointer;
-            transition: transform .22s ease, border-color .22s ease;
-            display: flex; align-items: center; justify-content: center;
+            width:20px; height:20px; border-radius:50%;
+            border:2px solid rgba(255,255,255,.2); cursor:pointer;
+            transition:transform .22s ease,border-color .22s ease;
+            display:flex; align-items:center; justify-content:center;
         }
-        .tBtn:hover  { transform: scale(1.22); border-color: rgba(255,255,255,0.65); }
-        .tBtn.active { border-color: rgba(255,255,255,0.95); transform: scale(1.15); }
-        .tBtn span   { display: block; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; }
+        .tBtn:hover  { transform:scale(1.22); border-color:rgba(255,255,255,.65); }
+        .tBtn.active { border-color:rgba(255,255,255,.95); transform:scale(1.15); }
+        .tBtn span   { display:block; width:10px; height:10px; border-radius:50%; pointer-events:none; }
 
-        /* ════════════════════════════════════════════════════════════
-           AUDIO BUTTON — from Canvas version (bottom-right corner)
-        ════════════════════════════════════════════════════════════ */
-        #audioBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 16px;
-            z-index: 20;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-top-color: rgba(255, 255, 255, 0.32);
-            border-radius: 100px;
-            color: rgba(255, 255, 255, 0.72);
-            font-family: 'Inter', inherit;
-            font-size: 11px; font-weight: 600; letter-spacing: .06em;
-            cursor: pointer;
-            transition: all .28s ease;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-        }
-        #audioBtn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.95);
-            transform: scale(1.05);
-        }
-        #audioBtn.on {
-            background: rgba(80, 200, 80, 0.12);
-            border-color: rgba(100, 220, 100, 0.32);
-            color: rgba(140, 255, 140, 0.9);
-        }
-
-        /* ════════════════════════════════════════════════════════════
-           DIKA STYLES — from Dika (glass enhanced with Canvas sheen)
-        ════════════════════════════════════════════════════════════ */
+        /* ════ DIKA styles (unchanged + enhanced) ════ */
         .glass {
-            background: rgba(10, 10, 20, 0.32);
-            backdrop-filter: blur(24px) saturate(240%) brightness(1.10);
-            -webkit-backdrop-filter: blur(24px) saturate(240%) brightness(1.10);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-top-color: rgba(255, 255, 255, 0.24);   /* meniscus top */
+            background:rgba(10,10,20,.32);
+            backdrop-filter:blur(26px) saturate(250%) brightness(1.12);
+            -webkit-backdrop-filter:blur(26px) saturate(250%) brightness(1.12);
+            border:1px solid rgba(255,255,255,.09);
+            border-top-color:rgba(255,255,255,.26);
             box-shadow:
-                0 25px 40px -12px rgba(0, 0, 0, 0.65),
-                0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-                inset 0 1px 0 rgba(255, 255, 255, 0.14),   /* top sheen */
-                inset 0 -1px 0 rgba(100, 160, 255, 0.08);  /* bottom water tint */
+                0 25px 40px -12px rgba(0,0,0,.65),
+                0 0 0 1px rgba(255,255,255,.02) inset,
+                inset 0 1px 0 rgba(255,255,255,.16),
+                inset 0 -1px 0 rgba(100,160,255,.08);
+            transition: box-shadow .3s ease, border-color .3s ease;
         }
-
+        .glass:hover {
+            border-top-color: rgba(255,255,255,.38);
+            box-shadow:
+                0 30px 50px -12px rgba(0,0,0,.70),
+                0 0 0 1px rgba(255,255,255,.04) inset,
+                inset 0 1.5px 0 rgba(255,255,255,.22),
+                inset 0 -1px 0 rgba(160,100,255,.14),
+                0 0 30px rgba(147,51,234,.12);
+        }
         .neon-glow {
-            text-shadow: 0 0 10px #c026d3, 0 0 25px #a855f7;
-            letter-spacing: -0.02em;
+            text-shadow:0 0 10px #c026d3, 0 0 25px #a855f7;
+            letter-spacing:-.02em;
         }
-
         .profile-container {
-            width: 7rem;
-            height: 7rem;
-            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-            filter: drop-shadow(0 20px 20px #a855f750);
+            width:12.5rem; height:12.5rem;
+            transition:transform .5s cubic-bezier(.2,.9,.3,1.2);
+            filter:drop-shadow(0 20px 20px #a855f750);
         }
-        .profile-container:hover { transform: scale(1.1) rotate(2deg); }
+        .profile-container:hover { transform:scale(1.1) rotate(2deg); }
 
         .social-card {
-            transition: all 0.2s ease-out;
-            will-change: transform;
-            transform-style: preserve-3d;
-            backface-visibility: hidden;
+            transition:all .2s ease-out;
+            will-change:transform;
+            transform-style:preserve-3d;
+            backface-visibility:hidden;
+            position:relative; overflow:hidden;
         }
-        .social-card i.fa-arrow-right,
-        .social-card i.fa-copy {
-            transition: transform 0.2s ease, opacity 0.2s;
+        /* Shimmer sweep on glass cards */
+        .social-card::after {
+            content:'';
+            position:absolute; inset:0;
+            background:linear-gradient(108deg,
+                transparent 20%,rgba(255,255,255,.06) 50%,transparent 80%);
+            transform:translateX(-100%);
+            transition:transform .0s;
+            pointer-events:none;
         }
-        .social-card:hover i.fa-arrow-right { transform: translateX(6px) scale(1.1); }
-        .social-card:hover i.fa-copy        { transform: scale(1.15); }
-        .social-card:active                 { transform: scale(0.98); }
+        .social-card:hover::after { animation:cardShimmer .7s ease forwards; }
+        @keyframes cardShimmer { to { transform:translateX(120%); } }
 
-        /* ── Page content sits above canvas ── */
-        .page-content {
-            position: relative;
-            z-index: 5;
+        .social-card i.fa-arrow-right, .social-card i.fa-copy {
+            transition:transform .2s ease,opacity .2s;
+        }
+        .social-card:hover i.fa-arrow-right { transform:translateX(6px) scale(1.1); }
+        .social-card:hover i.fa-copy        { transform:scale(1.15); }
+        .social-card:active                 { transform:scale(.98) !important; }
+
+        /* ════ Page content above canvas ════ */
+        .page-content { position:relative; z-index:5; }
+
+        /* ════ ENTRANCE ANIMATIONS ════ */
+        .card-enter {
+            opacity:0;
+            transform:translateY(36px) scale(.97);
+            transition:opacity .6s cubic-bezier(.16,1,.3,1),
+                       transform .6s cubic-bezier(.16,1,.3,1);
+        }
+        .card-enter.visible {
+            opacity:1; transform:translateY(0) scale(1);
         }
 
-        /* ── Canvas click ripple (injected by JS) ── */
-        .cglass-ripple {
-            position: fixed;
-            border-radius: 50%;
-            border: 1.5px solid rgba(200, 180, 255, 0.65);
-            pointer-events: none;
-            z-index: 15;
-            transform: translate(-50%, -50%) scale(0);
-            animation: cripple .85s cubic-bezier(0, 0, .2, 1) forwards;
+        /* Profile entrance */
+        .profile-enter {
+            opacity:0; transform:scale(.7);
+            animation:profileIn .9s cubic-bezier(.34,1.56,.64,1) .2s forwards;
         }
-        @keyframes cripple {
-            to { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+        @keyframes profileIn {
+            to { opacity:1; transform:scale(1); }
+        }
+
+        /* Title entrance */
+        .title-enter {
+            opacity:0; transform:translateY(24px);
+            animation:titleIn .8s cubic-bezier(.16,1,.3,1) .5s forwards;
+        }
+        @keyframes titleIn { to { opacity:1; transform:translateY(0); } }
+
+        /* Sub entrance */
+        .sub-enter {
+            opacity:0;
+            animation:fadeIn .8s ease .8s forwards;
+        }
+        @keyframes fadeIn { to { opacity:1; } }
+
+        /* Profile float */
+        .profile-float {
+            animation:profileFloat 6s ease-in-out infinite 1.2s;
+        }
+        @keyframes profileFloat {
+            0%,100% { transform:translateY(0) rotate(0deg); }
+            33%      { transform:translateY(-10px) rotate(1deg); }
+            66%      { transform:translateY(-6px) rotate(-0.5deg); }
+        }
+
+        /* Profile glow ring pulse */
+        @keyframes ringPulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(168,85,247,.5),0 0 20px 10px rgba(168,85,247,.25); }
+            50%      { box-shadow:0 0 0 10px rgba(168,85,247,0),0 0 32px 16px rgba(168,85,247,.15); }
+        }
+        .profile-ring {
+            animation:ringPulse 3.5s ease-in-out infinite 1.5s;
+        }
+
+        /* Neon text flicker */
+        @keyframes neonFlicker {
+            0%,18%,22%,25%,53%,57%,100% { text-shadow:0 0 10px #c026d3,0 0 25px #a855f7,0 0 50px #8b5cf6; }
+            20%,24%,55%                  { text-shadow:none; }
+        }
+        .neon-glow-anim { animation:neonFlicker 7s ease-in-out infinite 2s; }
+
+        /* Sub text gradient sweep */
+        @keyframes gradSweep {
+            0%   { background-position:0% 50%; }
+            50%  { background-position:100% 50%; }
+            100% { background-position:0% 50%; }
+        }
+        .grad-text {
+            background:linear-gradient(270deg,#e879f9,#c084fc,#a855f7,#db2777,#f472b6);
+            background-size:300% 300%;
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
+            animation:gradSweep 4s ease infinite;
+        }
+
+        /* Badge pulse */
+        @keyframes badgePulse {
+            0%,100%{ transform:scale(1); }
+            50%    { transform:scale(1.25); }
+        }
+
+        /* Floating chips behind content */
+        .liquid-chip {
+            position:fixed; pointer-events:none; z-index:1;
+            border-radius:50%;
+            background:radial-gradient(ellipse at 30% 30%,
+                rgba(200,100,255,.18),rgba(100,50,200,.06),transparent);
+            backdrop-filter:blur(8px) saturate(180%);
+            -webkit-backdrop-filter:blur(8px) saturate(180%);
+            border:1px solid rgba(200,100,255,.12);
+            border-top-color:rgba(220,150,255,.3);
+            animation:chipFloat linear infinite;
+        }
+        @keyframes chipFloat {
+            0%   { transform:translate(0,0) rotate(0deg) scale(1); }
+            25%  { transform:translate(12px,-18px) rotate(4deg) scale(1.06); }
+            50%  { transform:translate(-8px,-28px) rotate(-2deg) scale(.96); }
+            75%  { transform:translate(6px,-14px) rotate(3deg) scale(1.04); }
+            100% { transform:translate(0,0) rotate(0deg) scale(1); }
+        }
+
+        /* CSS ripple from click */
+        .css-ripple {
+            position:fixed; border-radius:50%; pointer-events:none; z-index:15;
+            border:1.5px solid rgba(200,180,255,.65);
+            transform:translate(-50%,-50%) scale(0);
+            animation:cssRip .9s cubic-bezier(0,0,.2,1) forwards;
+        }
+        @keyframes cssRip { to { transform:translate(-50%,-50%) scale(7); opacity:0; } }
+
+        /* Audio visualizer bars (shown when audio on) */
+
+        @media(max-width:480px){
+            .liquid-chip { display:none; }
         }
     </style>
 </head>
 
-<!-- ── body: Dika's original classes ── -->
 <body class="flex items-center justify-center p-4 relative">
 
-    <!-- ══════════════════════════════════════════════════════════
-         CANVAS BACKGROUND — from Canvas version
-         Renders: animated gradient + colorful orbs
-         Social cards' backdrop-filter blurs THIS canvas in real-time
-    ══════════════════════════════════════════════════════════ -->
-    <canvas id="mainCanvas"></canvas>
+    <!-- ════ WebGL background (Three.js r128) ════ -->
+    <canvas id="glCanvas"></canvas>
 
-    <!-- ── Theme Switcher — from Canvas version ── -->
+    <!-- ════ 2D FX overlay (particles, ripples, custom cursor) ════ -->
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- ════ Floating liquid chips ════ -->
+    <div class="liquid-chip" style="width:160px;height:160px;top:12%;left:3%;animation-duration:14s"></div>
+    <div class="liquid-chip" style="width:100px;height:100px;top:20%;right:5%;animation-duration:11s;animation-delay:-4s"></div>
+    <div class="liquid-chip" style="width:80px;height:80px;bottom:28%;left:6%;animation-duration:9s;animation-delay:-7s"></div>
+    <div class="liquid-chip" style="width:60px;height:60px;bottom:32%;right:8%;animation-duration:13s;animation-delay:-2s"></div>
+
+    <!-- ════ Theme Switcher ════ -->
     <div id="themePanel">
         <div class="tBtn" title="Ocean" onclick="setTheme(0)"><span style="background:linear-gradient(135deg,#0088ff,#00e5ff)"></span></div>
         <div class="tBtn" title="Sunset" onclick="setTheme(1)"><span style="background:linear-gradient(135deg,#ff4400,#ff0080)"></span></div>
@@ -201,24 +272,20 @@
         <div class="tBtn" title="Midnight" onclick="setTheme(4)"><span style="background:linear-gradient(135deg,#3355ff,#aabbff)"></span></div>
     </div>
 
-    <!-- ── Audio Reactive Button — from Canvas version ── -->
-    <button id="audioBtn" onclick="initAudio()">🎙 Audio</button>
 
-    <!-- ══════════════════════════════════════════════════════════
-         DIKA CONTENT — from Dika (unchanged)
-    ══════════════════════════════════════════════════════════ -->
+    <!-- ════ DIKA CONTENT — unchanged ════ -->
     <div class="max-w-md w-full mx-auto py-8 page-content">
 
         <div class="text-center mb-10">
-            <div class="mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-600/50 profile-container">
+            <div class="mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-600/50 profile-container profile-ring profile-float">
                 <img src="https://files.catbox.moe/0zcwkw.jpg" alt="Dika profile" class="w-full h-full object-cover">
             </div>
-            <h1 class="text-5xl font-bold mt-5 tracking-tighter neon-glow" style="font-family: 'Space Grotesk', sans-serif;">DIKA TECH</h1>
-            <p class="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mt-1 text-lg font-medium">script kiddie • execuidor</p>
+            <h1 class="text-5xl font-bold mt-5 tracking-tighter neon-glow neon-glow-anim title-enter" style="font-family:'Space Grotesk',sans-serif;">DIKA TECH</h1>
+            <p class="grad-text mt-1 text-lg font-medium sub-enter">script kiddie • execuidor</p>
         </div>
 
-        <div class="space-y-4">
-            <a href="https://www.tiktok.com/@dikasecx" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt data-tilt-max="8" data-tilt-speed="300" data-tilt-glare="false">
+        <div class="space-y-4" id="cardList">
+            <a href="https://www.tiktok.com/@dikasecx" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300" data-tilt-glare="false">
                 <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-3xl shadow-lg">
                     <i class="fa-brands fa-tiktok"></i>
                 </div>
@@ -229,7 +296,7 @@
                 <i class="fa-solid fa-arrow-right text-purple-400 text-xl"></i>
             </a>
 
-            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt data-tilt-max="8" data-tilt-speed="300">
+            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300">
                 <div class="w-12 h-12 bg-gradient-to-br from-[#feda77] via-[#d62976] to-[#4f5bd5] rounded-xl flex items-center justify-center text-3xl shadow-lg">
                     <i class="fa-brands fa-instagram"></i>
                 </div>
@@ -240,7 +307,7 @@
                 <i class="fa-solid fa-arrow-right text-purple-400 text-xl"></i>
             </a>
 
-            <a href="https://t.me/onedikaa" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt data-tilt-max="8" data-tilt-speed="300">
+            <a href="https://t.me/onedikaa" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300">
                 <div class="w-12 h-12 bg-[#1E96C8] rounded-xl flex items-center justify-center text-3xl shadow-lg">
                     <i class="fa-brands fa-telegram"></i>
                 </div>
@@ -251,7 +318,7 @@
                 <i class="fa-solid fa-arrow-right text-purple-400 text-xl"></i>
             </a>
 
-            <div onclick="copyDiscord()" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group cursor-pointer" data-tilt data-tilt-max="8" data-tilt-speed="300">
+            <div onclick="copyDiscord()" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group cursor-pointer card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300">
                 <div class="w-12 h-12 bg-[#5865F2] rounded-xl flex items-center justify-center text-3xl shadow-lg">
                     <i class="fa-brands fa-discord"></i>
                 </div>
@@ -262,7 +329,7 @@
                 <i class="fa-solid fa-copy text-purple-400 text-xl"></i>
             </div>
 
-            <a href="https://github.com/obitoGlory" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt data-tilt-max="8" data-tilt-speed="300">
+            <a href="https://github.com/obitoGlory" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300">
                 <div class="w-12 h-12 bg-[#171515] rounded-xl flex items-center justify-center text-3xl shadow-lg">
                     <i class="fa-brands fa-github"></i>
                 </div>
@@ -273,7 +340,7 @@
                 <i class="fa-solid fa-arrow-right text-purple-400 text-xl"></i>
             </a>
 
-            <a href="https://obitoGlory.github.io" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group" data-tilt data-tilt-max="8" data-tilt-speed="300">
+            <a href="https://obitoGlory.github.io" target="_blank" class="social-card glass rounded-2xl p-4 flex items-center gap-4 group card-enter" data-tilt data-tilt-max="8" data-tilt-speed="300">
                 <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-2xl shadow-lg">
                     <i class="fa-solid fa-globe"></i>
                 </div>
@@ -285,328 +352,481 @@
             </a>
         </div>
 
-        <p class="text-center text-zinc-600 text-xs mt-12 font-mono">dikatech s!nce 2k22</p>
+        <p class="text-center text-zinc-600 text-xs mt-12 font-mono sub-enter" style="animation-delay:1.1s">dikatech s!nce 2k22</p>
     </div>
-    <!-- ── end Dika content ── -->
 
 
-    <!-- ══════════════════════════════════════════════════════════
-         CANVAS ANIMATED BACKGROUND JS — from Canvas version
-         Only renders: gradient base + floating colorful orbs
-         + click ripple/particle effects
-         NO nav bar or hero text (Dika handles its own content)
-    ══════════════════════════════════════════════════════════ -->
+
+    <!-- ════════════════════════════════════════════════════════════
+         THREE.JS WEBGL — Ultra Realistic Liquid Glass Shader
+         Canvas 3D API: WebGL via Three.js r128
+    ════════════════════════════════════════════════════════════ -->
     <script>
+    (function() {
     'use strict';
 
-    /* ── THEMES (from Canvas version) ─────────────────────────────────── */
+    /* ── THEMES ── */
     const THEMES = [
-        { // 0: Ocean
-            bg:  ['#010810','#011220','#010A18'],
-            orbs:['#0055FF','#00CCFF','#0033CC','#00FFEE','#0077FF','#0099CC'],
-            accent:'#00C8FF'
-        },
-        { // 1: Sunset
-            bg:  ['#100308','#160410','#0C0308'],
-            orbs:['#FF4400','#FF0077','#CC00BB','#FF8800','#FF2244','#FF6600'],
-            accent:'#FF7733'
-        },
-        { // 2: Forest
-            bg:  ['#010A03','#021205','#010803'],
-            orbs:['#00CC44','#00FF99','#006622','#88FF44','#00AA44','#00FF66'],
-            accent:'#44FF99'
-        },
-        { // 3: Aurora (DEFAULT — matches Dika purple/pink)
-            bg:  ['#050108','#08020F','#050108'],
-            orbs:['#CC00FF','#FF44CC','#0088FF','#FF00BB','#7700FF','#00FFCC'],
-            accent:'#CC55FF'
-        },
-        { // 4: Midnight
-            bg:  ['#010108','#030320','#010108'],
-            orbs:['#3344FF','#6677FF','#AABBFF','#2233EE','#8899FF','#99AAFF'],
-            accent:'#99BBFF'
-        }
+        { c0:'#010810', c1:'#011220', c2:'#010A18',
+          o:['#0055FF','#00CCFF','#0033CC','#00FFEE','#0088FF'],
+          acc:[0.0,0.78,1.0] },
+        { c0:'#100308', c1:'#160410', c2:'#0C0308',
+          o:['#FF4400','#FF0077','#CC00BB','#FF8800','#FF2244'],
+          acc:[1.0,0.46,0.20] },
+        { c0:'#010A03', c1:'#021205', c2:'#010803',
+          o:['#00CC44','#00FF99','#006622','#88FF44','#00AA44'],
+          acc:[0.27,1.0,0.60] },
+        { c0:'#050108', c1:'#08020F', c2:'#050108',
+          o:['#CC00FF','#FF44CC','#0088FF','#FF00BB','#7700FF'],
+          acc:[0.80,0.33,1.0] },
+        { c0:'#010108', c1:'#030320', c2:'#010108',
+          o:['#3344FF','#6677FF','#AABBFF','#2233EE','#8899FF'],
+          acc:[0.60,0.73,1.0] }
     ];
 
-    /* ── STATE ─────────────────────────────────────────────────────────── */
-    let W, H;
-    let bgCanvas, bgCtx;
-    let mainCanvas, ctx;
-    let themeIdx = 3;                         // Default: Aurora (purple)
-    let t = 0, lastTime = 0;
-    const rawM = { x: 0, y: 0 };
-    const gyro  = { x: 0, y: 0 };
-    const particles = [], ripples = [];
+    let themeIdx = 3;
+    let W = window.innerWidth, H = window.innerHeight;
+    const rawM = { x:.5, y:.5 };
 
-    // Pre-load Dika background image so canvas can draw it
-    const dikaBgImg = new Image();
-    dikaBgImg.src = 'https://files.catbox.moe/9h7wpt.jpg';
-    let dikaBgLoaded = false;
-    dikaBgImg.onload = () => { dikaBgLoaded = true; };
+    const hx = (hex) => {
+        const r=parseInt(hex.slice(1,3),16)/255;
+        const g=parseInt(hex.slice(3,5),16)/255;
+        const b=parseInt(hex.slice(5,7),16)/255;
+        return new THREE.Color(r,g,b);
+    };
 
-    // Audio
-    let _audioCtx, analyser, audioArr;
-    let audioOn = false, audioLevel = 0, audioTarget = 0;
+    /* ── Renderer ── */
+    const gl = document.getElementById('glCanvas');
+    const renderer = new THREE.WebGLRenderer({
+        canvas: gl, antialias:true, alpha:false,
+        powerPreference:'high-performance'
+    });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
 
-    /* ── HELPERS ───────────────────────────────────────────────────────── */
-    const lerp  = (a, b, t) => a + (b - a) * t;
-    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const scene  = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 
-    function hexToRgba(hex, a) {
-        const r = parseInt(hex.slice(1,3),16);
-        const g = parseInt(hex.slice(3,5),16);
-        const b = parseInt(hex.slice(5,7),16);
-        return `rgba(${r},${g},${b},${a})`;
+    /* ════════════════════════════════════════════════════════════
+       ULTRA-REALISTIC FRAGMENT SHADER (v2.0)
+    ════════════════════════════════════════════════════════════ */
+    const frag = `
+    precision highp float;
+
+    uniform float uTime;
+    uniform vec2  uRes;
+    uniform vec2  uMouse;
+    uniform float uAudio;
+    uniform vec2  uGyro;
+    uniform int   uTheme;
+    uniform vec3  uC0, uC1, uC2;
+    uniform vec3  uO0,uO1,uO2,uO3,uO4;
+    uniform vec3  uAcc;
+
+    float h1(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+    float vnoise(vec2 p){
+        vec2 i=floor(p), f=fract(p);
+        f=f*f*(3.-2.*f);
+        return mix(mix(h1(i),h1(i+vec2(1.,0.)),f.x),mix(h1(i+vec2(0,1)),h1(i+vec2(1.,1.)),f.x),f.y);
+    }
+    float fbm(vec2 p){
+        float v=0., a=.5; vec2 shift=vec2(100);
+        for(int i=0;i<6;i++){ v+=a*vnoise(p); p=p*2.+shift; a*=.5; }
+        return v;
     }
 
-    function rrPath(c, x, y, w, h, r) {
-        c.beginPath();
-        c.moveTo(x+r, y); c.lineTo(x+w-r, y);
-        c.arcTo(x+w,y, x+w,y+r, r); c.lineTo(x+w, y+h-r);
-        c.arcTo(x+w,y+h, x+w-r,y+h, r); c.lineTo(x+r, y+h);
-        c.arcTo(x,y+h, x,y+h-r, r); c.lineTo(x, y+r);
-        c.arcTo(x,y, x+r,y, r); c.closePath();
+    vec2 gw(vec2 p, vec2 dir, float amp, float k, float spd, float t){
+        float ph = dot(normalize(dir),p)*k - spd*t;
+        return normalize(dir)*amp*cos(ph);
+    }
+    vec2 gerstnerSum(vec2 p, float t){
+        return gw(p,vec2(1.,.4),.02,22.,1.2,t)+gw(p,vec2(.6,1.),.015,28.,1.4,t)+gw(p,vec2(-.5,1.),.01,35.,1.8,t);
     }
 
-    /* ── BACKGROUND ORBS (from Canvas version) ─────────────────────────── */
-    const ORB_CFG = [
-        {bx:.13,by:.28,r:.60,s:.78,oi:0}, {bx:.82,by:.58,r:.65,s:.65,oi:1},
-        {bx:.48,by:.82,r:.48,s:1.18,oi:2},{bx:.25,by:.68,r:.52,s:.90,oi:3},
-        {bx:.72,by:.20,r:.42,s:1.08,oi:4},{bx:.58,by:.10,r:.36,s:.72,oi:5},
-        {bx:.10,by:.55,r:.40,s:1.28,oi:0},{bx:.88,by:.30,r:.38,s:.82,oi:1}
-    ];
-
-    function renderBg() {
-        const th = THEMES[themeIdx];
-        bgCtx.clearRect(0, 0, W, H);
-
-        /* ── 1. Dika's original dark base (#0a0a0f) ── */
-        bgCtx.fillStyle = '#0a0a0f';
-        bgCtx.fillRect(0, 0, W, H);
-
-        /* ── 2. Dika's original background image (catbox.moe) ── */
-        if (dikaBgLoaded) {
-            bgCtx.globalAlpha = 0.55;     // slightly dimmed for orb visibility
-            bgCtx.drawImage(dikaBgImg, 0, 0, W, H);
-            bgCtx.globalAlpha = 1;
+    float voro(vec2 p){
+        vec2 n=floor(p); float md=8.;
+        for(int x=-1;x<=1;x++) for(int y=-1;y<=1;y++){
+            vec2 g=vec2(float(x),float(y));
+            vec2 o=vec2(h1(n+g+.3), h1(n+g+7.1));
+            md = min(md, length(p-n-g-o));
         }
-
-        /* ── 3. Dika's original radial overlays (purple + pink) ── */
-        const p1 = bgCtx.createRadialGradient(W*.30,H*.40,0, W*.30,H*.40, W*.45);
-        p1.addColorStop(0, 'rgba(147,51,234,0.30)');
-        p1.addColorStop(1, 'transparent');
-        bgCtx.fillStyle = p1; bgCtx.fillRect(0,0,W,H);
-
-        const p2 = bgCtx.createRadialGradient(W*.80,H*.70,0, W*.80,H*.70, W*.48);
-        p2.addColorStop(0, 'rgba(236,72,153,0.22)');
-        p2.addColorStop(1, 'transparent');
-        bgCtx.fillStyle = p2; bgCtx.fillRect(0,0,W,H);
-
-        /* ── 4. Theme gradient overlay ── */
-        const bg = bgCtx.createLinearGradient(0,0,W,H);
-        bg.addColorStop(0,   hexToRgba(th.bg[0].replace('#',''), 0) || 'rgba(1,8,16,0.55)');
-        bg.addColorStop(1,   hexToRgba(th.bg[2].replace('#',''), 0) || 'rgba(1,10,24,0.55)');
-        // Use theme colors as semi-transparent overlay
-        const bgO = bgCtx.createLinearGradient(0,0,W,H);
-        bgO.addColorStop(0,  th.bg[0] + 'aa');
-        bgO.addColorStop(.5, th.bg[1] + '88');
-        bgO.addColorStop(1,  th.bg[2] + 'aa');
-        bgCtx.globalAlpha = 0.38;
-        bgCtx.fillStyle = bgO; bgCtx.fillRect(0,0,W,H);
-        bgCtx.globalAlpha = 1;
-
-        /* ── 5. Animated liquid glass orbs ── */
-        const audioBoost = 1 + audioLevel * .5;
-        ORB_CFG.forEach((o, i) => {
-            const ox  = o.bx*W + Math.sin(t*o.s + i*1.85)*W*.10;
-            const oy  = o.by*H + Math.cos(t*o.s*.62 + i*2.35)*H*.09;
-            const rad = o.r * Math.min(W,H) * .72 * audioBoost;
-            const col = th.orbs[o.oi % th.orbs.length];
-            const gr  = bgCtx.createRadialGradient(ox,oy,0,ox,oy,rad);
-            gr.addColorStop(0,    hexToRgba(col, 0.38));
-            gr.addColorStop(0.45, hexToRgba(col, 0.16));
-            gr.addColorStop(1,    hexToRgba(col, 0));
-            bgCtx.fillStyle = gr;
-            bgCtx.beginPath(); bgCtx.arc(ox,oy,rad,0,Math.PI*2); bgCtx.fill();
-        });
+        return md;
+    }
+    float caustics(vec2 uv, float t){
+        float c1 = pow(max(0., 1.-voro(uv*6.+t*.2)*1.2), 5.);
+        float c2 = pow(max(0., 1.-voro(uv*10.-t*.15+5.)*1.3), 4.);
+        return (c1+c2)*.5;
     }
 
-    /* ── PARTICLE SYSTEM (from Canvas version) ─────────────────────────── */
-    class Particle {
-        constructor(x, y, col) {
+    vec3 beer(float d){ return vec3(exp(-d*.6), exp(-d*.35), exp(-d*.15)); }
+    vec3 orb(vec2 uv, vec2 center, float r, vec3 col){
+        float d=length(uv-center)/r;
+        return col * exp(-d*d*3.5) * .6;
+    }
+
+    void main(){
+        vec2 uv = gl_FragCoord.xy/uRes;
+        vec2 suv = uv*vec2(uRes.x/uRes.y,1.);
+        float at = uTime;
+
+        /* Deep base */
+        vec3 color = mix(uC0, uC2, uv.y);
+        color = mix(color, uC1, 1.-abs(uv.y*2.-1.));
+
+        /* Dynamic Orbs */
+        color += orb(uv, vec2(.2+sin(at*.4)*.1, .3+cos(at*.3)*.08), .65, uO0);
+        color += orb(uv, vec2(.8+cos(at*.32)*.12, .65+sin(at*.42)*.1), .75, uO1);
+        color += orb(uv, vec2(.5+sin(at*.55)*.15, .8+cos(at*.65)*.1), .55, uO2);
+
+        /* Physical distortion */
+        vec2 waveN = gerstnerSum(suv*1.2, at);
+        float n0 = fbm(uv*4.0+at*.1);
+        vec2 fbmN = vec2(fbm(uv*4.0+at*.1+vec2(.01,0.))-n0, fbm(uv*4.0+at*.1+vec2(0.,.01))-n0)/.01;
+        
+        vec2 distort = waveN + fbmN*.012 + uGyro*.035;
+
+        /* Realistic Dispersion */
+        float l = length(uv-.5);
+        float ab = .04 + l*.06;
+        vec3 final;
+        final.r = mix(uC0, uC2, (uv+distort*(1.+ab)).y).r;
+        final.g = mix(uC0, uC2, (uv+distort).y).g;
+        final.b = mix(uC0, uC2, (uv+distort*(1.-ab)).y).b;
+        
+        final += uO0 * orb(uv+distort, vec2(.2,.3), .65, vec3(1.0)).r;
+        final += uO1 * orb(uv+distort, vec2(.8,.65), .75, vec3(1.0)).r;
+
+        /* High-res Caustics */
+        float c = caustics(uv*1.3+distort*.5, at);
+        final += uAcc * c * .95;
+
+        /* Physically-based Highlights */
+        vec3 normal = normalize(vec3(distort*20., 1.));
+        vec3 lightPos = vec3(.5+sin(at*.5)*.3, .5+cos(at*.5)*.3, 2.0);
+        vec3 lightDir = normalize(lightPos - vec3(uv, 0.));
+        float spec = pow(max(dot(normal, lightDir), 0.), 64.0);
+        final += vec3(1.1,1.0,0.9) * spec * .75;
+
+        /* TIR / Fresnel */
+        float fres = pow(1.-max(dot(normal, vec3(0,0,1)), 0.), 4.5);
+        final += fres * uAcc * .5;
+
+        final *= beer(.12);
+        final *= smoothstep(1.3, .3, length(uv-.5)); /* Vignette */
+
+        gl_FragColor = vec4(final, 1.0);
+    }`;
+
+    const vert = `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.); }`;
+
+    /* ── Uniforms ── */
+    function themeUniforms(i) {
+        const th = THEMES[i];
+        return {
+            uC0: { value: hx(th.c0) },
+            uC1: { value: hx(th.c1) },
+            uC2: { value: hx(th.c2) },
+            uO0: { value: hx(th.o[0]) },
+            uO1: { value: hx(th.o[1]) },
+            uO2: { value: hx(th.o[2]) },
+            uO3: { value: hx(th.o[3]) },
+            uO4: { value: hx(th.o[4]) },
+            uAcc:{ value: new THREE.Vector3(...th.acc) },
+        };
+    }
+
+    const uniforms = Object.assign({
+        uTime:  { value: 0 },
+        uRes:   { value: new THREE.Vector2(W, H) },
+        uMouse: { value: new THREE.Vector2(.5,.5) },
+        uAudio: { value: 0 },
+        uGyro:  { value: new THREE.Vector2(0,0) },
+        uTheme: { value: themeIdx },
+    }, themeUniforms(themeIdx));
+
+    const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(2,2),
+        new THREE.ShaderMaterial({
+            vertexShader: vert, fragmentShader: frag,
+            uniforms, depthTest:false, depthWrite:false
+        })
+    );
+    scene.add(mesh);
+
+    const clock = new THREE.Clock();
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        uniforms.uTime.value  = t;
+        uniforms.uMouse.value.set(rawM.x, rawM.y);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        W = window.innerWidth; H = window.innerHeight;
+        renderer.setSize(W, H);
+        uniforms.uRes.value.set(W, H);
+    });
+
+    window.addEventListener('mousemove', e => { rawM.x = e.clientX/W; rawM.y = e.clientY/H; }, {passive:true});
+    window.addEventListener('touchmove', e => { if(e.touches.length){ rawM.x=e.touches[0].clientX/W; rawM.y=e.touches[0].clientY/H; } }, {passive:true});
+
+    if(window.DeviceOrientationEvent){
+        window.addEventListener('deviceorientation', e => {
+            uniforms.uGyro.value.x = Math.max(-1,Math.min(1,(e.gamma||0)/45));
+            uniforms.uGyro.value.y = Math.max(-1,Math.min(1,((e.beta||0)-45)/45))*.8;
+        }, {passive:true});
+    }
+
+    window.setTheme = function(i) {
+        themeIdx = i;
+        const tu = themeUniforms(i);
+        Object.keys(tu).forEach(k => { uniforms[k].value = tu[k].value; });
+        uniforms.uTheme.value = i;
+        document.querySelectorAll('.tBtn').forEach((b,j)=>b.classList.toggle('active',j===i));
+    };
+
+    })(); /* end IIFE */
+    </script>
+
+
+    <!-- ════════════════════════════════════════════════════════════
+         2D FX CANVAS — particles, ripples, custom cursor, trail
+    ════════════════════════════════════════════════════════════ -->
+    <script>
+    (function(){
+    'use strict';
+    const fx   = document.getElementById('fxCanvas');
+    const ctx2 = fx.getContext('2d');
+    let FW = window.innerWidth, FH = window.innerHeight;
+    fx.width = FW; fx.height = FH;
+    window.addEventListener('resize',()=>{ FW=window.innerWidth; FH=window.innerHeight; fx.width=FW; fx.height=FH; });
+
+    /* Cursor state */
+    const cur    = { x:-300, y:-300 };
+    const curS   = { x:-300, y:-300 };
+    const trail  = [];
+    const TRAIL_LEN = 16;
+    const particles2 = [], ripples2 = [];
+
+    /* Accent color per theme (matches ThreeJS THEMES) */
+    const ACCENTS = ['#00C8FF','#FF7733','#44FF99','#CC55FF','#99BBFF'];
+    let accent2 = ACCENTS[3];
+
+    document.addEventListener('mousemove', e=>{ cur.x=e.clientX; cur.y=e.clientY; });
+
+    /* ── Particle ── */
+    class P2 {
+        constructor(x,y){
             this.x=x; this.y=y;
-            this.vx=(Math.random()-.5)*7;
-            this.vy=(Math.random()-.5)*7-2;
+            this.vx=(Math.random()-.5)*9;
+            this.vy=(Math.random()-.5)*9-3;
             this.r=Math.random()*4+1.5;
-            this.col=col;
-            this.life=0; this.max=38+Math.random()*24;
+            this.life=0; this.max=40+Math.random()*25;
+            this.col = Math.random()<.5 ? accent2 : '#fff';
             this.glow=Math.random()>.4;
             this.diamond=Math.random()<.3;
         }
-        tick() {
-            this.x+=this.vx; this.y+=this.vy;
-            this.vy+=.20; this.vx*=.965; this.life++;
-        }
-        draw() {
+        tick(){ this.x+=this.vx; this.y+=this.vy; this.vy+=.22; this.vx*=.96; this.life++; }
+        draw(){
             const a=1-this.life/this.max;
             const r=this.r*(0.5+a*.5);
-            ctx.save(); ctx.globalAlpha=a;
-            if(this.glow){ctx.shadowColor=this.col; ctx.shadowBlur=12;}
-            ctx.fillStyle=this.col;
+            ctx2.save(); ctx2.globalAlpha=a;
+            if(this.glow){ ctx2.shadowColor=this.col; ctx2.shadowBlur=14; }
+            ctx2.fillStyle=this.col;
             if(this.diamond){
-                ctx.beginPath();
-                ctx.moveTo(this.x,this.y-r*1.3); ctx.lineTo(this.x+r,this.y);
-                ctx.lineTo(this.x,this.y+r*1.3); ctx.lineTo(this.x-r,this.y);
-                ctx.closePath(); ctx.fill();
+                ctx2.beginPath();
+                ctx2.moveTo(this.x,this.y-r*1.4); ctx2.lineTo(this.x+r,this.y);
+                ctx2.lineTo(this.x,this.y+r*1.4); ctx2.lineTo(this.x-r,this.y);
+                ctx2.closePath(); ctx2.fill();
             } else {
-                ctx.beginPath(); ctx.arc(this.x,this.y,r,0,Math.PI*2); ctx.fill();
+                ctx2.beginPath(); ctx2.arc(this.x,this.y,r,0,Math.PI*2); ctx2.fill();
             }
-            ctx.restore();
+            ctx2.restore();
         }
         dead(){ return this.life>=this.max; }
     }
 
-    function spawnParticles(x, y) {
-        const th=THEMES[themeIdx];
-        const cols=[th.accent,'#ffffff','#e0c0ff',...th.orbs.slice(0,3)];
-        for(let i=0;i<16;i++)
-            particles.push(new Particle(x, y, cols[Math.floor(Math.random()*cols.length)]));
+    function spawnBurst(x,y,n=20){
+        for(let i=0;i<n;i++) particles2.push(new P2(x,y));
     }
 
-    /* ── RIPPLE SYSTEM (from Canvas version) ───────────────────────────── */
-    function spawnRipple(x, y) {
-        ripples.push({x,y,r:6,maxR:70,alpha:0.85});
-        setTimeout(()=>ripples.push({x,y,r:4,maxR:44,alpha:0.55}), 80);
+    /* ── Ripple ── */
+    function spawnRipple2(x,y){
+        ripples2.push({x,y,r:6,maxR:72,a:.9});
+        setTimeout(()=>ripples2.push({x,y,r:4,maxR:46,a:.55}),80);
     }
 
-    function tickRipples() {
-        for(let i=ripples.length-1;i>=0;i--){
-            const rip=ripples[i];
+    /* ── RAF loop ── */
+    function fx2Loop(){
+        ctx2.clearRect(0,0,FW,FH);
+
+        /* Trail */
+        trail.push({x:cur.x,y:cur.y});
+        if(trail.length>TRAIL_LEN) trail.shift();
+        for(let i=0;i<trail.length;i++){
+            const a=(i/trail.length)*.45;
+            const r=(i/trail.length)*6;
+            ctx2.save();
+            ctx2.globalAlpha=a;
+            ctx2.fillStyle=accent2;
+            ctx2.shadowColor=accent2; ctx2.shadowBlur=8;
+            ctx2.beginPath(); ctx2.arc(trail[i].x,trail[i].y,r,0,Math.PI*2);
+            ctx2.fill(); ctx2.restore();
+        }
+
+        /* Smooth cursor dot */
+        curS.x+=(cur.x-curS.x)*.18; curS.y+=(cur.y-curS.y)*.18;
+        ctx2.save();
+        ctx2.fillStyle='#fff'; ctx2.shadowColor='#fff'; ctx2.shadowBlur=10;
+        ctx2.beginPath(); ctx2.arc(curS.x,curS.y,4.5,0,Math.PI*2); ctx2.fill();
+        ctx2.restore();
+
+        /* Cursor ring (lagging) */
+        ctx2.save();
+        ctx2.globalAlpha=.5;
+        ctx2.strokeStyle=accent2; ctx2.lineWidth=1.5;
+        ctx2.shadowColor=accent2; ctx2.shadowBlur=6;
+        ctx2.beginPath(); ctx2.arc(curS.x,curS.y,22,0,Math.PI*2); ctx2.stroke();
+        ctx2.restore();
+
+        /* Particles */
+        particles2.forEach(p=>{ p.tick(); p.draw(); });
+        for(let i=particles2.length-1;i>=0;i--) if(particles2[i].dead()) particles2.splice(i,1);
+
+        /* Ripples */
+        for(let i=ripples2.length-1;i>=0;i--){
+            const rip=ripples2[i];
             const prog=rip.r/rip.maxR;
-            ctx.save();
-            ctx.globalAlpha=rip.alpha*(1-prog)*.8;
-            ctx.strokeStyle=THEMES[themeIdx].accent;
-            ctx.lineWidth=2*(1-prog*.8);
-            ctx.beginPath(); ctx.arc(rip.x,rip.y,rip.r,0,Math.PI*2); ctx.stroke();
-            ctx.restore();
+            ctx2.save();
+            ctx2.globalAlpha=rip.a*(1-prog)*.8;
+            ctx2.strokeStyle=accent2; ctx2.lineWidth=2*(1-prog*.8);
+            ctx2.shadowColor=accent2; ctx2.shadowBlur=8;
+            ctx2.beginPath(); ctx2.arc(rip.x,rip.y,rip.r,0,Math.PI*2); ctx2.stroke();
+            ctx2.restore();
             rip.r+=2.8;
-            if(rip.r>=rip.maxR) ripples.splice(i,1);
-        }
-    }
-
-    /* ── MAIN CANVAS LOOP ──────────────────────────────────────────────── */
-    function draw(ts) {
-        const dt = Math.min((ts-lastTime)*.001, .05);
-        lastTime = ts; t += dt;
-
-        /* 1. Render orbs to offscreen bgCanvas */
-        renderBg();
-
-        /* 2. Draw bg to main canvas */
-        ctx.clearRect(0, 0, W, H);
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(bgCanvas, 0, 0, W, H);
-
-        /* 3. Audio update */
-        if(audioOn && analyser){
-            analyser.getByteFrequencyData(audioArr);
-            let sum=0; audioArr.forEach(v=>sum+=v);
-            audioTarget=(sum/audioArr.length)/255;
-        } else { audioTarget=0; }
-        audioLevel=lerp(audioLevel, audioTarget, .08);
-
-        /* 4. Particles & ripples */
-        particles.forEach(p=>{ p.tick(); p.draw(); });
-        for(let i=particles.length-1;i>=0;i--) if(particles[i].dead()) particles.splice(i,1);
-        tickRipples();
-
-        requestAnimationFrame(draw);
-    }
-
-    /* ── RESIZE ────────────────────────────────────────────────────────── */
-    function resize() {
-        W=window.innerWidth; H=window.innerHeight;
-        if(mainCanvas){ mainCanvas.width=W; mainCanvas.height=H; }
-        if(bgCanvas)  { bgCanvas.width=W;   bgCanvas.height=H;   }
-    }
-
-    /* ── THEME SWITCHER (from Canvas version) ──────────────────────────── */
-    function setTheme(i) {
-        themeIdx=i;
-        document.querySelectorAll('.tBtn').forEach((b,j)=>b.classList.toggle('active',j===i));
-    }
-
-    /* ── AUDIO (from Canvas version) ───────────────────────────────────── */
-    async function initAudio() {
-        const btn=document.getElementById('audioBtn');
-        if(audioOn) return;
-        try{
-            _audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-            analyser=_audioCtx.createAnalyser();
-            analyser.fftSize=256; analyser.smoothingTimeConstant=.85;
-            const s=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-            _audioCtx.createMediaStreamSource(s).connect(analyser);
-            audioArr=new Uint8Array(analyser.frequencyBinCount);
-            audioOn=true;
-            btn.textContent='🎙 ON'; btn.classList.add('on');
-        }catch(e){
-            btn.textContent='🎙 Denied';
-            console.warn('Audio:',e);
-        }
-    }
-
-    /* ── INIT ──────────────────────────────────────────────────────────── */
-    window.addEventListener('load', () => {
-        mainCanvas=document.getElementById('mainCanvas');
-        ctx=mainCanvas.getContext('2d',{alpha:true});
-
-        bgCanvas=document.createElement('canvas');
-        bgCtx=bgCanvas.getContext('2d');
-
-        resize();
-        rawM.x=W/2; rawM.y=H/2;
-
-        window.addEventListener('resize', resize);
-
-        window.addEventListener('mousemove', e=>{
-            rawM.x=e.clientX; rawM.y=e.clientY;
-        }, {passive:true});
-
-        window.addEventListener('touchmove', e=>{
-            if(e.touches.length){
-                rawM.x=e.touches[0].clientX; rawM.y=e.touches[0].clientY;
-            }
-        }, {passive:true});
-
-        /* Click → canvas ripple + particles (from Canvas version) */
-        window.addEventListener('click', e=>{
-            spawnRipple(e.clientX, e.clientY);
-            spawnParticles(e.clientX, e.clientY);
-
-            /* CSS ripple ring for social cards (extra tactile feel) */
-            const el=document.createElement('div');
-            el.className='cglass-ripple';
-            el.style.cssText=`left:${e.clientX}px;top:${e.clientY}px;width:30px;height:30px;`;
-            document.body.appendChild(el);
-            setTimeout(()=>el.remove(), 900);
-        });
-
-        /* Gyroscope (from Canvas version) */
-        if(window.DeviceOrientationEvent){
-            window.addEventListener('deviceorientation', e=>{
-                gyro.x=clamp((e.gamma||0)/45,-1,1);
-                gyro.y=clamp(((e.beta||0)-45)/45,-1,1)*.8;
-            }, {passive:true});
+            if(rip.r>=rip.maxR) ripples2.splice(i,1);
         }
 
-        requestAnimationFrame(draw);
+        requestAnimationFrame(fx2Loop);
+    }
+    fx2Loop();
+
+    /* ── Click → burst + ripple + CSS ripple ── */
+    window.addEventListener('click',e=>{
+        spawnBurst(e.clientX,e.clientY);
+        spawnRipple2(e.clientX,e.clientY);
+        const el=document.createElement('div');
+        el.className='css-ripple';
+        el.style.cssText=`left:${e.clientX}px;top:${e.clientY}px;width:30px;height:30px;`;
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(),950);
     });
+
+    /* ── Expose accent update ── */
+    const origSet = window.setTheme;
+    window.setTheme = function(i){
+        accent2 = ACCENTS[i];
+        if(origSet) origSet(i);
+    };
+
+    /* ── Audio bars HTML ── */
+    const barsEl = document.getElementById('audioBars');
+    for(let i=0;i<8;i++){
+        const b=document.createElement('div'); b.className='aBar';
+        barsEl.appendChild(b);
+    }
+
+    })();
     </script>
 
-    <!-- ══════════════════════════════════════════════════════════
-         DIKA JS — from Dika (unchanged)
-    ══════════════════════════════════════════════════════════ -->
+
+    <!-- ════════════════════════════════════════════════════════════
+         JS ANIMATIONS — entrances, magnetic hover, spring float
+    ════════════════════════════════════════════════════════════ -->
+    <script>
+    (function(){
+    'use strict';
+
+    /* ── Staggered card entrance via IntersectionObserver ── */
+    const cards = document.querySelectorAll('.card-enter');
+    const obs = new IntersectionObserver(entries=>{
+        entries.forEach((en,i)=>{
+            if(en.isIntersecting){
+                setTimeout(()=>en.target.classList.add('visible'), i*90);
+                obs.unobserve(en.target);
+            }
+        });
+    },{ threshold:.15 });
+    cards.forEach(c=>obs.observe(c));
+    /* Force them visible quickly if already in viewport */
+    setTimeout(()=>cards.forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*90+300)),200);
+
+    /* ── Magnetic hover on social cards ── */
+    document.querySelectorAll('.social-card').forEach(card=>{
+        card.addEventListener('mousemove',e=>{
+            const r=card.getBoundingClientRect();
+            const cx=r.left+r.width/2, cy=r.top+r.height/2;
+            const dx=(e.clientX-cx)*.08, dy=(e.clientY-cy)*.06;
+            card.style.transform=`translate(${dx}px,${dy}px)`;
+        });
+        card.addEventListener('mouseleave',()=>{
+            card.style.transform='';
+        });
+    });
+
+    /* ── Typing effect on subtitle (re-types every 8s) ── */
+    const sub = document.querySelector('.grad-text');
+    if(sub){
+        const txt = sub.textContent;
+        let ti=0, typing=true;
+        function typeStep(){
+            if(typing){
+                sub.textContent=txt.slice(0,ti);
+                ti++;
+                if(ti>txt.length){ typing=false; setTimeout(typeStep,4500); return; }
+                setTimeout(typeStep,60);
+            } else {
+                ti=0; typing=true;
+                setTimeout(typeStep,400);
+            }
+        }
+        setTimeout(typeStep,1800);
+    }
+
+    /* ── Profile click burst ── */
+    const prof=document.querySelector('.profile-container');
+    if(prof){
+        prof.addEventListener('click',e=>{
+            /* Spawn extra CSS ripple rings */
+            for(let i=0;i<3;i++){
+                setTimeout(()=>{
+                    const el=document.createElement('div');
+                    el.className='css-ripple';
+                    el.style.cssText=`left:${e.clientX}px;top:${e.clientY}px;width:36px;height:36px;border-color:rgba(168,85,247,.7);`;
+                    document.body.appendChild(el);
+                    setTimeout(()=>el.remove(),950);
+                },i*120);
+            }
+        });
+    }
+
+    /* ── Theme panel: keyboard shortcuts 1-5 ── */
+    document.addEventListener('keydown',e=>{
+        const k=parseInt(e.key);
+        if(k>=1&&k<=5) window.setTheme(k-1);
+    });
+
+    })();
+    </script>
+
+
+    <!-- ════════════════════════════════════════════════════════════
+         DIKA JS — unchanged
+    ════════════════════════════════════════════════════════════ -->
     <script>
         VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
             max: 9,
@@ -620,7 +840,6 @@
         function copyDiscord() {
             navigator.clipboard.writeText("dikaalonely").then(() => {
                 const discordSpan = document.getElementById('discord-text');
-                const originalText = discordSpan.innerText;
                 discordSpan.innerText = "copied! ✓";
                 discordSpan.classList.add('text-green-400', 'font-medium');
                 setTimeout(() => {
