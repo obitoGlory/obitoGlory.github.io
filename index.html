@@ -3,195 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dika Tech | Portofolio</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-
+    <title>Dika</title>
+    <meta name="description" content="Portfolio Dika - Script Kiddie & Execuidor">
+    
+    <!-- Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Critical CSS inline - no Tailwind CDN -->
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color:#020205; font-family:'Inter',sans-serif; color:white; overflow-x:hidden; }
-
-        #glCanvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
-        /* Glassmorphism dioptimasi */
-        .glass {
-            background: rgba(15, 15, 25, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform, opacity;
+        /* ════ RESET & BASE ════ */
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{
+            font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+            background:linear-gradient(135deg,#0a0a14 0%,#1a1a2e 50%,#0a0a14 100%);
+            color:#fff;min-height:100vh;overflow-x:hidden;
+            cursor:default;line-height:1.5
         }
-
-        .grid-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(168, 85, 247, 0.4);
-            background: rgba(255, 255, 255, 0.05);
+        
+        /* ════ LIGHTWEIGHT BACKGROUND (CSS-only) ════ */
+        .bg-gradient{
+            position:fixed;inset:0;z-index:0;pointer-events:none;
+            background:
+                radial-gradient(ellipse at 20% 80%,rgba(120,80,200,.15) 0%,transparent 50%),
+                radial-gradient(ellipse at 80% 20%,rgba(180,100,255,.12) 0%,transparent 50%),
+                radial-gradient(ellipse at 50% 50%,rgba(100,60,180,.08) 0%,transparent 70%);
+            animation:bgPulse 15s ease-in-out infinite alternate
         }
-
-        .profile-img {
-            width: 110px; height: 110px;
-            border-radius: 50%;
-            border: 3px solid #a855f7;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-            object-fit: cover;
+        @keyframes bgPulse{
+            0%{background-position:0% 50%}
+            100%{background-position:100% 50%}
         }
-
-        .neon-text { text-shadow: 0 0 10px rgba(168, 85, 247, 0.8); }
-
-        /* Animasi masuk */
-        .fade-in { opacity: 0; transform: translateY(15px); animation: fadeIn 0.5s forwards; }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-
-        /* Scrollbar Halus */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        /* ════ GLASS CARD (optimized) ════ */
+        .glass{
+            background:rgba(25,25,45,.6);
+            border:1px solid rgba(255,255,255,.1);
+            border-radius:1rem;
+            transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+            will-change:transform
+        }
+        .glass:hover{
+            border-color:rgba(168,85,247,.5);
+            box-shadow:0 8px 32px rgba(168,85,247,.15)
+        }
+        
+        /* ════ CONTENT LAYOUT ════ */
+        .container{max-width:28rem;margin:0 auto;padding:1.5rem;position:relative;z-index:1}
+        
+        /* ════ PROFILE ════ */
+        .profile-wrap{
+            width:8rem;height:8rem;margin:0 auto 1.25rem;
+            border-radius:50%;overflow:hidden;
+            border:3px solid rgba(168,85,247,.6);
+            box-shadow:0 0 20px rgba(168,85,247,.3);
+            transition:transform .3s ease
+        }
+        .profile-wrap:hover{transform:scale(1.05)}
+        .profile-img{width:100%;height:100%;object-fit:cover}
+        
+        /* ════ TEXT STYLES ════ */
+        .title{
+            font-size:2rem;font-weight:800;letter-spacing:-.03em;
+            background:linear-gradient(135deg,#e879f9,#a855f7);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            text-shadow:0 0 20px rgba(168,85,247,.3)
+        }
+        .subtitle{
+            color:rgba(255,255,255,.7);font-size:1rem;margin-top:.25rem
+        }
+        
+        /* ════ SOCIAL CARDS ════ */
+        .card-list{display:grid;gap:.75rem;margin-top:1.5rem}
+        .social-card{
+            display:flex;align-items:center;gap:1rem;padding:1rem;
+            text-decoration:none;color:inherit;cursor:pointer
+        }
+        .icon-box{
+            width:3rem;height:3rem;border-radius:.75rem;
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.5rem;flex-shrink:0
+        }
+        .card-content{flex:1;min-width:0}
+        .card-title{font-weight:600;font-size:1.1rem}
+        .card-sub{color:rgba(255,255,255,.6);font-size:.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .card-arrow{
+            color:rgba(168,85,247,.8);font-size:1.25rem;
+            transition:transform .2s ease
+        }
+        .social-card:hover .card-arrow{transform:translateX(4px)}
+        
+        /* ════ THEME TOGGLE (minimal) ════ */
+        .theme-toggle{
+            position:fixed;top:1rem;right:1rem;z-index:10;
+            display:flex;gap:.5rem;background:rgba(25,25,45,.8);
+            padding:.375rem;border-radius:999px;
+            border:1px solid rgba(255,255,255,.1)
+        }
+        .theme-btn{
+            width:1.5rem;height:1.5rem;border-radius:50%;
+            border:2px solid transparent;cursor:pointer;
+            transition:transform .15s ease,border-color .15s ease
+        }
+        .theme-btn:hover{transform:scale(1.1)}
+        .theme-btn.active{border-color:#fff;transform:scale(1.15)}
+        
+        /* ════ FOOTER ════ */
+        .footer{
+            text-align:center;color:rgba(255,255,255,.4);
+            font-size:.75rem;font-family:monospace;margin-top:2rem;padding-bottom:1rem
+        }
+        
+        /* ════ ANIMATIONS (reduced motion friendly) ════ */
+        @media(prefers-reduced-motion:reduce){
+            *{animation:none!important;transition:none!important}
+        }
+        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .animate-in{animation:fadeIn .4s ease forwards}
+        .delay-1{animation-delay:.1s}
+        .delay-2{animation-delay:.2s}
+        .delay-3{animation-delay:.3s}
+        
+        /* ════ MOBILE OPTIMIZATIONS ════ */
+        @media(max-width:480px){
+            .container{padding:1rem}
+            .title{font-size:1.75rem}
+            .profile-wrap{width:7rem;height:7rem}
+            .social-card{padding:.875rem}
+            .icon-box{width:2.75rem;height:2.75rem;font-size:1.25rem}
+        }
+        
+        /* ════ COPY FEEDBACK ════ */
+        .copied{color:#4ade80!important;font-weight:500}
+        
+        /* ════ RIPPLE EFFECT (CSS-only, lightweight) ════ */
+        .ripple{
+            position:absolute;border-radius:50%;
+            background:rgba(255,255,255,.3);
+            transform:scale(0);animation:ripple .6s ease-out;
+            pointer-events:none
+        }
+        @keyframes ripple{to{transform:scale(4);opacity:0}}
     </style>
+    
+    <!-- Font Awesome (subset - only what we need) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/brands.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/solid.min.css">
 </head>
 
-<body class="flex flex-col items-center min-h-screen p-5">
-
-    <canvas id="glCanvas"></canvas>
-
-    <div class="relative z-10 w-full max-w-lg">
-        
-        <!-- Header Section -->
-        <header class="text-center mt-6 mb-10 fade-in">
-            <img src="https://files.catbox.moe/0zcwkw.jpg" alt="Dika" class="profile-img mx-auto mb-4">
-            <h1 class="text-3xl font-extrabold tracking-tighter neon-text font-[Space Grotesk]">DIKA TECH</h1>
-            <p class="text-gray-400 text-sm mt-1">script kiddie • execuidor</p>
-        </header>
-
-        <!-- Link Grid -->
-        <div class="grid grid-cols-2 gap-3 sm:gap-4">
-            
-            <!-- TikTok -->
-            <a href="https://www.tiktok.com/@dikasecx" target="_blank" class="grid-card glass p-4 rounded-2xl flex flex-col items-center text-center fade-in" style="animation-delay: 0.1s;">
-                <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center text-xl mb-3 shadow-lg">
-                    <i class="fa-brands fa-tiktok"></i>
-                </div>
-                <span class="font-bold text-sm">TikTok</span>
-                <span class="text-[10px] text-gray-500 mt-1 truncate w-full">@dikasecx</span>
-            </a>
-
-            <!-- Instagram -->
-            <a href="https://www.instagram.com/obitoesquado" target="_blank" class="grid-card glass p-4 rounded-2xl flex flex-col items-center text-center fade-in" style="animation-delay: 0.2s;">
-                <div class="w-12 h-12 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-lg">
-                    <i class="fa-brands fa-instagram"></i>
-                </div>
-                <span class="font-bold text-sm">Instagram</span>
-                <span class="text-[10px] text-gray-500 mt-1 truncate w-full">@obitoesquado</span>
-            </a>
-
-            <!-- Telegram -->
-            <a href="https://t.me/onedikaa" target="_blank" class="grid-card glass p-4 rounded-2xl flex flex-col items-center text-center fade-in" style="animation-delay: 0.3s;">
-                <div class="w-12 h-12 bg-[#0088cc] rounded-full flex items-center justify-center text-xl mb-3 shadow-lg">
-                    <i class="fa-brands fa-telegram"></i>
-                </div>
-                <span class="font-bold text-sm">Telegram</span>
-                <span class="text-[10px] text-gray-500 mt-1 truncate w-full">@onedikaa</span>
-            </a>
-
-            <!-- GitHub -->
-            <a href="https://github.com/obitoGlory" target="_blank" class="grid-card glass p-4 rounded-2xl flex flex-col items-center text-center fade-in" style="animation-delay: 0.4s;">
-                <div class="w-12 h-12 bg-[#171515] rounded-full flex items-center justify-center text-xl mb-3 shadow-lg">
-                    <i class="fa-brands fa-github"></i>
-                </div>
-                <span class="font-bold text-sm">GitHub</span>
-                <span class="text-[10px] text-gray-500 mt-1 truncate w-full">obitoGlory</span>
-            </a>
-
-            <!-- Discord (Full Width / Spans 2 columns) -->
-            <div onclick="copyDiscord()" class="grid-card glass p-4 rounded-2xl flex items-center col-span-2 cursor-pointer fade-in" style="animation-delay: 0.5s;">
-                <div class="w-10 h-10 bg-[#5865F2] rounded-xl flex items-center justify-center text-xl mr-4 shadow-lg">
-                    <i class="fa-brands fa-discord"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="font-bold text-sm">Discord</p>
-                    <p id="discord-text" class="text-[10px] text-gray-500">@dikaalonely</p>
-                </div>
-                <i class="fa-solid fa-copy text-gray-600 text-sm"></i>
-            </div>
-
-            <!-- Website -->
-            <a href="https://obitoGlory.github.io" target="_blank" class="grid-card glass p-4 rounded-2xl flex flex-col items-center text-center col-span-2 fade-in" style="animation-delay: 0.6s;">
-                <span class="font-bold text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-globe text-purple-500"></i> Portfolio Website
-                </span>
-            </a>
-
-        </div>
-
-        <footer class="text-center mt-12 text-gray-700 text-[10px] uppercase tracking-widest fade-in" style="animation-delay: 0.8s;">
-            dikatech s!nce 2k22
-        </footer>
+<body>
+    <!-- Lightweight CSS Background -->
+    <div class="bg-gradient" aria-hidden="true"></div>
+    
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" role="group" aria-label="Pilih tema">
+        <button class="theme-btn" style="background:linear-gradient(135deg,#0088ff,#00e5ff)" data-theme="0" title="Ocean"></button>
+        <button class="theme-btn" style="background:linear-gradient(135deg,#ff4400,#ff0080)" data-theme="1" title="Sunset"></button>
+        <button class="theme-btn" style="background:linear-gradient(135deg,#00cc44,#00ffaa)" data-theme="2" title="Forest"></button>
+        <button class="theme-btn active" style="background:linear-gradient(135deg,#cc00ff,#ff44cc)" data-theme="3" title="Aurora"></button>
+        <button class="theme-btn" style="background:linear-gradient(135deg,#3355ff,#aabbff)" data-theme="4" title="Midnight"></button>
     </div>
-
-    <!-- ── OPTIMIZED LIGHTWEIGHT SHADER ── -->
-    <script>
-    (function() {
-        const canvas = document.getElementById('glCanvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Profile Section -->
+        <section class="text-center" aria-label="Profil">
+            <div class="profile-wrap">
+                <img src="https://files.catbox.moe/0zcwkw.jpg" alt="Foto profil Dika" class="profile-img" loading="lazy" width="128" height="128">
+            </div>
+            <h1 class="title animate-in">DIKA TECH</h1>
+            <p class="subtitle animate-in delay-1">script kiddie • execuidor</p>
+        </section>
         
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        renderer.setPixelRatio(isMobile ? 1 : window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-        const fragmentShader = `
-            precision mediump float;
-            uniform float uTime;
-            uniform vec2 uRes;
-            void main() {
-                vec2 uv = gl_FragCoord.xy / uRes;
-                float t = uTime * 0.4;
-                vec3 c1 = vec3(0.06, 0.0, 0.12);
-                vec3 c2 = vec3(0.01, 0.01, 0.05);
-                float pulse = 0.5 + 0.5 * sin(t + distance(uv, vec2(0.5)));
-                vec3 color = mix(c1, c2, uv.y + pulse * 0.2);
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        const material = new THREE.ShaderMaterial({
-            uniforms: {
-                uTime: { value: 0 },
-                uRes: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
-            },
-            vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
-            fragmentShader
+        <!-- Social Links -->
+        <nav class="card-list" aria-label="Link sosial media">
+            <a href="https://www.tiktok.com/@dikasecx" target="_blank" rel="noopener" class="social-card glass animate-in delay-2">
+                <div class="icon-box" style="background:#000"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">TikTok</div>
+                    <div class="card-sub">@dikasecx</div>
+                </div>
+                <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+            </a>
+            
+            <a href="https://www.instagram.com/obitoesquado" target="_blank" rel="noopener" class="social-card glass animate-in delay-2">
+                <div class="icon-box" style="background:linear-gradient(135deg,#feda77,#d62976,#4f5bd5)"><i class="fa-brands fa-instagram" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">Instagram</div>
+                    <div class="card-sub">@obitoesquado</div>
+                </div>
+                <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+            </a>
+            
+            <a href="https://t.me/onedikaa" target="_blank" rel="noopener" class="social-card glass animate-in delay-2">
+                <div class="icon-box" style="background:#1E96C8"><i class="fa-brands fa-telegram" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">Telegram</div>
+                    <div class="card-sub">@onedikaa</div>
+                </div>
+                <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+            </a>
+            
+            <button onclick="copyDiscord(this)" class="social-card glass animate-in delay-2" aria-label="Salin username Discord">
+                <div class="icon-box" style="background:#5865F2"><i class="fa-brands fa-discord" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">Discord</div>
+                    <div class="card-sub" id="discord-text">@dikaalonely</div>
+                </div>
+                <i class="fa-solid fa-copy card-arrow" aria-hidden="true"></i>
+            </button>
+            
+            <a href="https://github.com/obitoGlory" target="_blank" rel="noopener" class="social-card glass animate-in delay-3">
+                <div class="icon-box" style="background:#171515"><i class="fa-brands fa-github" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">GitHub</div>
+                    <div class="card-sub">obitoGlory</div>
+                </div>
+                <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+            </a>
+            
+            <a href="https://obitoGlory.github.io" target="_blank" rel="noopener" class="social-card glass animate-in delay-3">
+                <div class="icon-box" style="background:linear-gradient(135deg,#4f46e5,#9333ea)"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
+                <div class="card-content">
+                    <div class="card-title">Website</div>
+                    <div class="card-sub">obitoGlory.github.io</div>
+                </div>
+                <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+            </a>
+        </nav>
+        
+        <footer class="footer animate-in delay-3">dikatech s!nce 2k22</footer>
+    </main>
+    
+    <!-- Minimal JavaScript - No heavy libraries -->
+    <script>
+    'use strict';
+    
+    /* ════ THEME SWITCHER ════ */
+    const THEMES = [
+        {bg:'linear-gradient(135deg,#010810,#011220,#010A18)',accent:'#00C8FF'},
+        {bg:'linear-gradient(135deg,#100308,#160410,#0C0308)',accent:'#FF7733'},
+        {bg:'linear-gradient(135deg,#010A03,#021205,#010803)',accent:'#44FF99'},
+        {bg:'linear-gradient(135deg,#050108,#08020F,#050108)',accent:'#CC55FF'},
+        {bg:'linear-gradient(135deg,#010108,#030320,#010108)',accent:'#99BBFF'}
+    ];
+    
+    function setTheme(idx){
+        document.body.style.background = THEMES[idx].bg;
+        document.documentElement.style.setProperty('--accent', THEMES[idx].accent);
+        document.querySelectorAll('.theme-btn').forEach((btn,i)=>{
+            btn.classList.toggle('active',i===idx);
         });
-
-        scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
-
-        function animate(t) {
-            material.uniforms.uTime.value = t * 0.001;
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
-        requestAnimationFrame(animate);
-
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            material.uniforms.uRes.value.set(window.innerWidth, window.innerHeight);
+    }
+    
+    document.querySelectorAll('.theme-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>setTheme(parseInt(btn.dataset.theme)));
+    });
+    
+    /* ════ COPY DISCORD ════ */
+    function copyDiscord(btn){
+        navigator.clipboard?.writeText('dikaalonely').then(()=>{
+            const txt = btn.querySelector('#discord-text');
+            const original = txt.textContent;
+            txt.textContent = 'copied! ✓';
+            txt.classList.add('copied');
+            setTimeout(()=>{txt.textContent=original;txt.classList.remove('copied')},1200);
+        }).catch(()=>{
+            prompt('Salin manual:', 'dikaalonely');
         });
-    })();
-
-    function copyDiscord() {
-        navigator.clipboard.writeText("dikaalonely").then(() => {
-            const el = document.getElementById('discord-text');
-            el.innerText = "Copied!";
-            el.style.color = "#a855f7";
-            setTimeout(() => {
-                el.innerText = "@dikaalonely";
-                el.style.color = "";
-            }, 1000);
+    }
+    
+    /* ═══️ LIGHTWEIGHT RIPPLE EFFECT ════ */
+    document.querySelectorAll('.social-card').forEach(card=>{
+        card.addEventListener('click',function(e){
+            if(this.tagName==='A') return;
+            const rect = this.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.left = (e.clientX - rect.left) + 'px';
+            ripple.style.top = (e.clientY - rect.top) + 'px';
+            this.appendChild(ripple);
+            setTimeout(()=>ripple.remove(),600);
+        });
+    });
+    
+    /* ════ PERFORMANCE: Reduce animations on low-end devices ════ */
+    if(navigator.deviceMemory && navigator.deviceMemory < 4){
+        document.querySelectorAll('.animate-in').forEach(el=>{
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+    }
+    
+    /* ════ Intersection Observer for lazy animations ════ */
+    if('IntersectionObserver' in window){
+        const observer = new IntersectionObserver((entries)=>{
+            entries.forEach(entry=>{
+                if(entry.isIntersecting){
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        },{threshold:.1});
+        
+        document.querySelectorAll('.animate-in').forEach(el=>{
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
         });
     }
     </script>
